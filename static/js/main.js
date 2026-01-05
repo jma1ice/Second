@@ -1,7 +1,16 @@
-// Main JavaScript for Second game app
-
 document.addEventListener('DOMContentLoaded', function() {
-    // Add smooth scrolling to anchor links
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+        document.documentElement.style.backgroundColor = '#0f0f1a';
+        document.body.style.backgroundColor = '#0f0f1a';
+        document.body.style.backgroundAttachment = 'scroll';
+        
+        setTimeout(() => {
+            document.body.style.display = 'none';
+            document.body.offsetHeight;
+            document.body.style.display = '';
+        }, 100);
+    }
+
     const links = document.querySelectorAll('a[href^="#"]');
     links.forEach(link => {
         link.addEventListener('click', function(e) {
@@ -16,7 +25,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Add hover effects to vote options
     const voteOptions = document.querySelectorAll('.vote-option');
     voteOptions.forEach(option => {
         option.addEventListener('mouseenter', function() {
@@ -28,7 +36,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Add form validation feedback
     const forms = document.querySelectorAll('form');
     forms.forEach(form => {
         form.addEventListener('submit', function(e) {
@@ -51,7 +58,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Auto-hide flash messages after 5 seconds
     const flashMessages = document.querySelectorAll('.flash');
     flashMessages.forEach(message => {
         setTimeout(() => {
@@ -63,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     });
 
-    // Add loading states to buttons
     const buttons = document.querySelectorAll('.btn');
     buttons.forEach(button => {
         if (button.type === 'submit') {
@@ -78,7 +83,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Add character counters to text inputs with maxlength
     const textInputs = document.querySelectorAll('input[type="text"][maxlength], textarea[maxlength]');
     textInputs.forEach(input => {
         const maxLength = input.getAttribute('maxlength');
@@ -110,7 +114,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Utility function to show flash messages dynamically
 function showFlashMessage(message, type = 'info') {
     const flashContainer = document.querySelector('.flash-messages') || createFlashContainer();
     
@@ -123,7 +126,6 @@ function showFlashMessage(message, type = 'info') {
     
     flashContainer.appendChild(flash);
     
-    // Auto-remove after 5 seconds
     setTimeout(() => {
         flash.style.opacity = '0';
         flash.style.transform = 'translateY(-20px)';
@@ -141,7 +143,6 @@ function createFlashContainer() {
     return container;
 }
 
-// Add some visual flair with particle effects on wins
 function celebrateWin() {
     const winnerCard = document.querySelector('.winner-card');
     if (winnerCard) {
@@ -172,7 +173,6 @@ function createConfetti() {
     }
 }
 
-// Add the falling animation for confetti
 const style = document.createElement('style');
 style.textContent = `
     @keyframes fall {
@@ -192,7 +192,6 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Initialize confetti on results page if there's a winner
 if (document.querySelector('.winner-card')) {
     setTimeout(celebrateWin, 1000);
 }

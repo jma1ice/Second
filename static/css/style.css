@@ -1,5 +1,4 @@
 :root {
-    /* Strategic Dark Theme */
     --bg-primary: #0f0f1a;
     --bg-secondary: #1a1a2e;
     --bg-tertiary: #16213e;
@@ -14,12 +13,10 @@
     --warning: #ffc107;
     --error: #dc3545;
     
-    /* Shadows and Effects */
     --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
     --shadow-sharp: 0 2px 8px rgba(0, 0, 0, 0.5);
     --glow-gold: 0 0 20px rgba(255, 215, 0, 0.3);
     
-    /* Typography */
     --font-display: 'Playfair Display', serif;
     --font-mono: 'JetBrains Mono', monospace;
     --font-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -31,26 +28,61 @@
     box-sizing: border-box;
 }
 
+html {
+    background-color: var(--bg-primary);
+    min-height: 100vh;
+}
+
 body {
     font-family: var(--font-system);
-    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    background-color: var(--bg-primary);
+    background: var(--bg-primary);
     color: var(--text-primary);
     line-height: 1.6;
     min-height: 100vh;
     position: relative;
 }
 
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(22, 33, 62, 0.8) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: -1;
+@media (min-width: 768px) {
+    body {
+        background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    }
+    
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(22, 33, 62, 0.8) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: -1;
+    }
+}
+
+@media (max-width: 767px) {
+    html {
+        background: var(--bg-primary) !important;
+    }
+    
+    body {
+        background: var(--bg-primary) !important;
+        background-image: 
+            linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%),
+            radial-gradient(circle at top left, rgba(255, 215, 0, 0.05) 0%, transparent 40%),
+            radial-gradient(circle at bottom right, rgba(22, 33, 62, 0.3) 0%, transparent 40%);
+        background-attachment: scroll;
+        background-size: 100% 100%, 50% 50%, 50% 50%;
+        background-position: center, top left, bottom right;
+        background-repeat: no-repeat;
+    }
+    
+    .app-container {
+        background: transparent;
+        min-height: 100vh;
+    }
 }
 
 .app-container {
@@ -59,14 +91,25 @@ body::before {
     flex-direction: column;
 }
 
-/* Navigation */
 .nav-header {
     background: rgba(26, 26, 46, 0.95);
     border-bottom: 1px solid var(--border-subtle);
-    backdrop-filter: blur(10px);
     position: sticky;
     top: 0;
     z-index: 100;
+}
+
+@media (min-width: 768px) {
+    .nav-header {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+}
+
+@media (max-width: 767px) {
+    .nav-header {
+        background: var(--bg-secondary);
+    }
 }
 
 .nav-content {
@@ -132,7 +175,6 @@ body::before {
     background: var(--accent-gold);
 }
 
-/* Main Content */
 .main-content {
     flex: 1;
     max-width: 1200px;
@@ -141,7 +183,6 @@ body::before {
     width: 100%;
 }
 
-/* Flash Messages */
 .flash-messages {
     margin-bottom: 2rem;
 }
@@ -174,7 +215,6 @@ body::before {
     font-size: 1.2rem;
 }
 
-/* Typography */
 h1, h2, h3 {
     font-family: var(--font-display);
     color: var(--text-primary);
@@ -210,7 +250,6 @@ h3 {
     font-family: var(--font-mono);
 }
 
-/* Cards and Containers */
 .card {
     background: rgba(26, 26, 46, 0.7);
     border: 1px solid var(--border-subtle);
@@ -218,8 +257,20 @@ h3 {
     padding: 2rem;
     margin-bottom: 2rem;
     box-shadow: var(--shadow-soft);
-    backdrop-filter: blur(10px);
     transition: all 0.3s ease;
+}
+
+@media (min-width: 768px) {
+    .card {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+}
+
+@media (max-width: 767px) {
+    .card {
+        background: rgba(26, 26, 46, 0.9);
+    }
 }
 
 .card:hover {
@@ -240,7 +291,6 @@ h3 {
     }
 }
 
-/* Forms */
 .form-group {
     margin-bottom: 1.5rem;
 }
@@ -281,7 +331,6 @@ h3 {
     min-height: 120px;
 }
 
-/* Buttons */
 .btn {
     display: inline-block;
     padding: 1rem 2rem;
@@ -324,7 +373,6 @@ h3 {
     font-size: 0.9rem;
 }
 
-/* Vote Options */
 .vote-options {
     display: flex;
     flex-direction: column;
@@ -369,7 +417,6 @@ h3 {
     margin-right: 0.75rem;
 }
 
-/* Results */
 .results-grid {
     display: grid;
     gap: 1rem;
@@ -423,7 +470,6 @@ h3 {
     box-shadow: 0 0 20px rgba(40, 167, 69, 0.2);
 }
 
-/* Polls List */
 .polls-list {
     display: flex;
     flex-direction: column;
@@ -481,7 +527,6 @@ h3 {
     border: 1px solid var(--text-muted);
 }
 
-/* Footer */
 .app-footer {
     background: rgba(15, 15, 26, 0.9);
     border-top: 1px solid var(--border-subtle);
@@ -506,7 +551,6 @@ h3 {
     font-weight: 600;
 }
 
-/* Animations */
 @keyframes slideInDown {
     from {
         transform: translateY(-20px);
@@ -533,7 +577,6 @@ h3 {
     animation: fadeInUp 0.4s ease;
 }
 
-/* Mobile Responsiveness */
 @media (max-width: 768px) {
     .main-content {
         padding: 1rem;
@@ -584,5 +627,33 @@ h3 {
     .nav-link {
         width: 100%;
         text-align: center;
+    }
+}
+
+@supports (-webkit-touch-callout: none) {
+    html, body {
+        background-color: var(--bg-primary) !important;
+    }
+    
+    body {
+        -webkit-background-size: cover;
+        background-size: cover;
+        background-attachment: scroll !important;
+    }
+    
+    @media (max-width: 767px) {
+        html, body, .app-container {
+            background: var(--bg-primary) !important;
+        }
+        
+        body {
+            background-image: 
+                radial-gradient(circle at top left, rgba(255, 215, 0, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at bottom right, rgba(22, 33, 62, 0.3) 0%, transparent 40%) !important;
+        }
+        
+        .main-content, .app-container, .nav-header, .app-footer {
+            background-color: transparent;
+        }
     }
 }
