@@ -1,0 +1,484 @@
+{% extends "base.html" %}
+
+{% block title %}Results: {{ poll.topic }} - Second{% endblock %}
+
+{% block content %}
+    <div class="results-header">
+        <h1>Poll Results</h1>
+        <h2 class="poll-topic">{{ poll.topic }}</h2>
+        <div class="poll-meta">
+            <span class="poll-id">Poll ID: {{ poll.id }}</span>
+            <span class="poll-status {{ 'status-closed' if poll.is_closed else 'status-active' }}">
+                {{ 'Closed' if poll.is_closed else 'Active' }}
+            </span>
+        </div>
+    </div>
+
+    <div class="winner-announcement">
+        {% if sorted_results[0][1] > 0 %}
+            {% if sorted_results|length >= 2 and sorted_results[1][1] > 0 %}
+                <div class="card winner-card">
+                    <h3>🏆 Winners</h3>
+                    <div class="winner-details">
+                        <p class="winner-text">
+                            Players who voted for <strong>{{ [poll.option1, poll.option2, poll.option3][winner_option-1] }}</strong> win!
+                        </p>
+                        <p class="winner-explanation">
+                            This option came in second place with {{ sorted_results[1][1] }} votes, 
+                            making it the strategic choice.
+                        </p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card no-winner-card">
+                    <h3>🤔 No Winners</h3>
+                    <p>Only one option received votes, so there's no second place. The psychology didn't work out this time!</p>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="card no-votes-card">
+                <h3>📭 No Votes Yet</h3>
+                <p>Be the first to vote and start the strategic game!</p>
+                <a href="{{ url_for('view_poll', poll_id=poll.id) }}" class="btn btn-primary">Vote Now</a>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if sorted_results[0][1] > 0 %}
+        <div class="results-breakdown">
+            <h3>Vote Breakdown</h3>
+            <div class="results-grid">
+                {% for option_num, vote_count in sorted_results %}
+                    {% set option_text = [poll.option1, poll.option2, poll.option3][option_num-1] %}
+                    {% set total_votes = sorted_results|sum(attribute=1) %}
+                    {% set percentage = (vote_count / total_votes * 100) if total_votes > 0 else 0 %}
+                    {% set is_winner = option_num == winner_option %}
+                    {% set place = loop.index %}
+                    
+                    <div class="result-item {% if is_winner %}winner-highlight{% endif %}">
+                        <div class="result-header">
+                            <div class="result-info">
+                                <span class="result-place">{{ place }}{{ 'st' if place == 1 else 'nd' if place == 2 else 'rd' if place == 3 else 'th' }} Place</span>
+                                <span class="result-option">{{ option_text }}</span>
+                                {% if is_winner %}
+                                    <span class="winner-badge">🏆 WINNER</span>
+                                {% endif %}
+                            </div>
+                            <div class="result-stats">
+                                <span class="result-votes">{{ vote_count }} votes</span>
+                                <span class="result-percentage">{{ "%.1f"|format(percentage) }}%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="result-bar">
+                            <div class="result-bar-fill" style="width: {{ percentage }}%"></div>
+                        </div>
+                        
+                        {% if place == 1 %}
+                            <p class="place-explanation">Most popular - voting for this was risky!</p>
+                        {% elif place == 2 and is_winner %}
+                            <p class="place-explanation">Perfect prediction - you read the room correctly!</p>
+                        {% elif place == 2 %}
+                            <p class="place-explanation">Second place - this was the winning choice!</p>
+                        {% else %}
+                            <p class="place-explanation">Least popular - safe but not strategic enough.</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="strategy-analysis">
+            <div class="card">
+                <h3>Strategy Analysis</h3>
+                {% set first_place_votes = sorted_results[0][1] %}
+                {% set second_place_votes = sorted_results[1][1] if sorted_results|length >= 2 else 0 %}
+                {% set third_place_votes = sorted_results[2][1] if sorted_results|length >= 3 else 0 %}
+                {% set total_votes = sorted_results|sum(attribute=1) %}
+                
+                <div class="analysis-grid">
+                    <div class="analysis-item">
+                        <h4>Crowd Psychology</h4>
+                        {% if first_place_votes > second_place_votes * 2 %}
+                            <p>The crowd heavily favored one option - easy to predict but risky to vote for.</p>
+                        {% elif first_place_votes == second_place_votes %}
+                            <p>Very close between first and second! This was a tough call.</p>
+                        {% else %}
+                            <p>Good distribution - the strategic thinking paid off.</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="analysis-item">
+                        <h4>Strategic Difficulty</h4>
+                        {% set spread = first_place_votes - third_place_votes %}
+                        {% if spread <= 1 %}
+                            <p><strong>High:</strong> Very even distribution made prediction difficult.</p>
+                        {% elif spread <= 3 %}
+                            <p><strong>Medium:</strong> Some clear preferences but still strategic.</p>
+                        {% else %}
+                            <p><strong>Low:</strong> Clear favorites made second place predictable.</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="analysis-item">
+                        <h4>Participation</h4>
+                        <p><strong>{{ total_votes }}</strong> total votes cast</p>
+                        {% if total_votes < 5 %}
+                            <p>Small sample - results might vary with more players.</p>
+                        {% elif total_votes < 15 %}
+                            <p>Good participation for meaningful results.</p>
+                        {% else %}
+                            <p>Great turnout! Results are quite reliable.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="results-actions">
+        <div class="card">
+            <h3>What's Next?</h3>
+            <div class="actions-grid">
+                <a href="{{ url_for('view_poll', poll_id=poll.id) }}" class="btn btn-secondary">← Back to Poll</a>
+                <a href="{{ url_for('create_poll') }}" class="btn btn-primary">Create New Poll</a>
+                <a href="{{ url_for('home') }}" class="btn btn-secondary">Browse Polls</a>
+            </div>
+            
+            <div class="share-results">
+                <h4>Share These Results</h4>
+                <div class="share-link">
+                    <input type="text" 
+                        value="{{ request.url }}" 
+                        class="form-input share-input" 
+                        readonly 
+                        onclick="this.select()">
+                    <button onclick="copyLink()" class="btn btn-secondary btn-small">Copy Link</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .results-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .results-header h1 {
+            margin-bottom: 0.5rem;
+        }
+
+        .poll-topic {
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .winner-announcement {
+            margin-bottom: 3rem;
+        }
+
+        .winner-card {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(40, 167, 69, 0.05) 100%);
+            border-color: var(--success);
+            text-align: center;
+        }
+
+        .winner-card h3 {
+            color: var(--success);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .winner-details {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .winner-text {
+            font-size: 1.3rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-family: var(--font-display);
+        }
+
+        .winner-text strong {
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .winner-explanation {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .no-winner-card, .no-votes-card {
+            text-align: center;
+            background: rgba(108, 117, 125, 0.1);
+            border-color: var(--text-muted);
+        }
+
+        .no-winner-card h3, .no-votes-card h3 {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .results-breakdown {
+            margin-bottom: 3rem;
+        }
+
+        .results-breakdown h3 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--accent-gold);
+            font-family: var(--font-display);
+            font-size: 2rem;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .result-info {
+            flex: 1;
+        }
+
+        .result-place {
+            display: block;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+
+        .result-option {
+            display: block;
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .winner-badge {
+            display: inline-block;
+            background: var(--success);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .result-stats {
+            text-align: right;
+        }
+
+        .result-votes {
+            display: block;
+            font-family: var(--font-mono);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+        }
+
+        .result-percentage {
+            display: block;
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .result-bar-fill {
+            background: linear-gradient(90deg, var(--accent-gold) 0%, var(--accent-gold-dim) 100%);
+            animation: fillBar 1s ease 0.5s both;
+        }
+
+        .winner-highlight .result-bar-fill {
+            background: linear-gradient(90deg, var(--success) 0%, #20c997 100%);
+        }
+
+        .place-explanation {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-style: italic;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .strategy-analysis {
+            margin-bottom: 3rem;
+        }
+
+        .strategy-analysis h3 {
+            color: var(--accent-gold);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-family: var(--font-display);
+        }
+
+        .analysis-grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .analysis-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .analysis-item {
+            background: rgba(22, 33, 62, 0.3);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .analysis-item h4 {
+            color: var(--accent-gold);
+            font-family: var(--font-display);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .analysis-item p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .analysis-item strong {
+            color: var(--text-primary);
+        }
+
+        .results-actions {
+            margin-top: 3rem;
+        }
+
+        .results-actions h3 {
+            color: var(--accent-gold);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .actions-grid {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .share-results {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .share-results h4 {
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+            font-family: var(--font-display);
+            text-align: center;
+        }
+
+        .share-link {
+            display: flex;
+            gap: 0.5rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .share-input {
+            flex: 1;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+        }
+
+        @keyframes fillBar {
+            from {
+                width: 0;
+            }
+            to {
+                width: var(--target-width);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .result-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .result-stats {
+                text-align: left;
+            }
+            
+            .actions-grid {
+                flex-direction: column;
+            }
+            
+            .actions-grid .btn {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .share-link {
+                flex-direction: column;
+            }
+            
+            .share-link .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const bars = document.querySelectorAll('.result-bar-fill');
+            bars.forEach((bar, index) => {
+                const width = bar.style.width;
+                bar.style.setProperty('--target-width', width);
+                bar.style.width = '0';
+                
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 500 + index * 200);
+            });
+        });
+
+        function copyLink() {
+            const input = document.querySelector('.share-input');
+            input.select();
+            input.setSelectionRange(0, 99999);
+            
+            try {
+                document.execCommand('copy');
+                const button = document.querySelector('.share-link .btn');
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = 'var(--success)';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '';
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy link:', err);
+            }
+        }
+    </script>
+{% endblock %}

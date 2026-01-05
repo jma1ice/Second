@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Second - The Strategy Game{% endblock %}
+
+{% block content %}
+    <div class="hero-section">
+        <h1>Second</h1>
+        <p class="subtitle">The psychology-based voting game where you win by predicting what comes second.</p>
+        
+        <div class="hero-actions">
+            <a href="{{ url_for('create_poll') }}" class="btn btn-primary">Create New Poll</a>
+        </div>
+    </div>
+
+    <section class="game-explanation">
+        <div class="card">
+            <h2>How to Play</h2>
+            <div class="rules-grid">
+                <div class="rule-item">
+                    <h3>1. Someone Creates a Poll</h3>
+                    <p>A topic with exactly three options. For example: "Most popular Muppet" with Kermit, Fozzie, and Animal.</p>
+                </div>
+                <div class="rule-item">
+                    <h3>2. Everyone Votes Strategically</h3>
+                    <p>Don't vote for what you think will be <em>first</em>. Vote for what you think will come <em>second</em>.</p>
+                </div>
+                <div class="rule-item">
+                    <h3>3. Winners Are Revealed</h3>
+                    <p>Everyone who voted for the second-place option wins. It's all about reading the room.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% if polls %}
+        <section class="recent-polls">
+            <h2>Recent Polls</h2>
+            <div class="polls-list">
+                {% for poll in polls %}
+                    <div class="poll-item">
+                        <div class="poll-topic">
+                            <a href="{{ url_for('view_poll', poll_id=poll.id) }}" style="color: inherit; text-decoration: none;">
+                                {{ poll.topic }}
+                            </a>
+                        </div>
+                        <div class="poll-meta">
+                            <span class="poll-id">ID: {{ poll.id }}</span>
+                            <span class="poll-votes">{{ poll.vote_count }} votes</span>
+                            <span class="poll-status {{ 'status-closed' if poll.is_closed else 'status-active' }}">
+                                {{ 'Closed' if poll.is_closed else 'Active' }}
+                            </span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    {% else %}
+        <section class="empty-state">
+            <div class="card">
+                <h2>No Polls Yet</h2>
+                <p>Be the first to create a strategic poll and watch the psychology unfold.</p>
+                <a href="{{ url_for('create_poll') }}" class="btn btn-primary">Create the First Poll</a>
+            </div>
+        </section>
+    {% endif %}
+
+    <style>
+        .hero-section {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 3rem 0;
+        }
+
+        .hero-actions {
+            margin-top: 2rem;
+        }
+
+        .game-explanation {
+            margin-bottom: 3rem;
+        }
+
+        .rules-grid {
+            display: grid;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .rules-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .rule-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(22, 33, 62, 0.3);
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .rule-item h3 {
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .rule-item p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .rule-item em {
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        .recent-polls {
+            margin-top: 3rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+    </style>
+{% endblock %}

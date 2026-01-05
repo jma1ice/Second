@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block title %}{{ poll.topic }} - Second{% endblock %}
+
+{% block content %}
+    <div class="poll-header">
+        <h1>{{ poll.topic }}</h1>
+        <div class="poll-meta">
+            <span class="poll-id">Poll ID: {{ poll.id }}</span>
+            {% if poll.is_closed %}
+                <span class="poll-status status-closed">Closed</span>
+            {% else %}
+                <span class="poll-status status-active">Active</span>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if not poll.is_closed and not has_voted %}
+        <div class="voting-section">
+            <div class="strategy-reminder">
+                <div class="card">
+                    <h3>🎯 Strategy Reminder</h3>
+                    <p>Vote for what you think will come <strong>second</strong>, not first. Read the room and predict how others will think!</p>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('vote', poll_id=poll.id) }}" class="vote-form">
+                <div class="vote-options">
+                    <label class="vote-option" for="option1">
+                        <input type="radio" name="option" value="1" id="option1" required>
+                        <span class="vote-option-number">1.</span>
+                        <span class="vote-option-label">{{ poll.option1 }}</span>
+                    </label>
+
+                    <label class="vote-option" for="option2">
+                        <input type="radio" name="option" value="2" id="option2" required>
+                        <span class="vote-option-number">2.</span>
+                        <span class="vote-option-label">{{ poll.option2 }}</span>
+                    </label>
+
+                    <label class="vote-option" for="option3">
+                        <input type="radio" name="option" value="3" id="option3" required>
+                        <span class="vote-option-number">3.</span>
+                        <span class="vote-option-label">{{ poll.option3 }}</span>
+                    </label>
+                </div>
+
+                <div class="vote-actions">
+                    <button type="submit" class="btn btn-primary">Submit Vote</button>
+                </div>
+            </form>
+        </div>
+    {% endif %}
+
+    {% if has_voted %}
+        <div class="voted-section">
+            <div class="card">
+                <h3>✓ Vote Submitted</h3>
+                <p>You've already voted on this poll. Now we wait to see how others think...</p>
+                
+                {% if total_votes > 0 %}
+                    <div class="current-stats">
+                        <h4>Current Vote Count</h4>
+                        <p><strong>{{ total_votes }}</strong> total votes cast</p>
+                        
+                        {% if not poll.is_closed %}
+                            <p class="stats-note">Results will be revealed when the poll is closed.</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+                
+                <div class="poll-actions">
+                    {% if not poll.is_closed %}
+                        <a href="{{ url_for('results', poll_id=poll.id) }}" class="btn btn-secondary btn-small">View Current Results</a>
+                    {% else %}
+                        <a href="{{ url_for('results', poll_id=poll.id) }}" class="btn btn-primary">View Final Results</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if poll.is_closed %}
+        <div class="closed-section">
+            <div class="card">
+                <h3>📊 Poll Closed</h3>
+                <p>This poll has ended. Check out the results to see who won!</p>
+                <a href="{{ url_for('results', poll_id=poll.id) }}" class="btn btn-primary">View Results</a>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if total_votes > 0 and not poll.is_closed %}
+        <div class="live-stats">
+            <div class="card">
+                <h3>Live Stats</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-number">{{ total_votes }}</span>
+                        <span class="stat-label">Total Votes</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ vote_counts.values() | list | max if vote_counts.values() else 0 }}</span>
+                        <span class="stat-label">Highest Count</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ (vote_counts.values() | list | length) - (vote_counts.values() | select("equalto", 0) | list | length) }}</span>
+                        <span class="stat-label">Options with Votes</span>
+                    </div>
+                </div>
+                <p class="stats-note">The actual vote distribution is hidden until the poll closes.</p>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="poll-controls">
+        <div class="card">
+            <h3>Poll Controls</h3>
+            <div class="controls-grid">
+                <a href="{{ url_for('home') }}" class="btn btn-secondary">← Back to Home</a>
+                
+                {% if not poll.is_closed %}
+                    <form method="POST" action="{{ url_for('close_poll', poll_id=poll.id) }}" class="inline-form" onsubmit="return confirm('Are you sure you want to close this poll? This cannot be undone.');">
+                        <button type="submit" class="btn btn-secondary btn-small">Close Poll</button>
+                    </form>
+                {% endif %}
+                
+                <a href="{{ url_for('results', poll_id=poll.id) }}" class="btn btn-secondary">View Results</a>
+            </div>
+            
+            <div class="share-section">
+                <h4>Share This Poll</h4>
+                <div class="share-link">
+                    <input type="text" 
+                        value="{{ request.url }}" 
+                        class="form-input share-input" 
+                        readonly 
+                        onclick="this.select()">
+                    <button onclick="copyLink()" class="btn btn-secondary btn-small">Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .poll-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .poll-header h1 {
+            margin-bottom: 1rem;
+        }
+
+        .poll-meta {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .poll-id {
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .voting-section {
+            margin-bottom: 3rem;
+        }
+
+        .strategy-reminder {
+            margin-bottom: 2rem;
+        }
+
+        .strategy-reminder h3 {
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+        }
+
+        .strategy-reminder strong {
+            color: var(--accent-gold);
+        }
+
+        .vote-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .vote-actions {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .voted-section, .closed-section {
+            margin-bottom: 2rem;
+        }
+
+        .current-stats {
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: rgba(22, 33, 62, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .current-stats h4 {
+            color: var(--accent-gold);
+            margin-bottom: 0.5rem;
+            font-family: var(--font-display);
+        }
+
+        .stats-note {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-style: italic;
+            margin-top: 1rem;
+        }
+
+        .poll-actions {
+            margin-top: 1.5rem;
+        }
+
+        .live-stats {
+            margin-bottom: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(22, 33, 62, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            font-family: var(--font-mono);
+        }
+
+        .stat-label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .poll-controls {
+            margin-top: 3rem;
+        }
+
+        .controls-grid {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .inline-form {
+            display: inline;
+        }
+
+        .share-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .share-section h4 {
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+            font-family: var(--font-display);
+        }
+
+        .share-link {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .share-input {
+            flex: 1;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .controls-grid {
+                flex-direction: column;
+            }
+            
+            .controls-grid .btn {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .share-link {
+                flex-direction: column;
+            }
+            
+            .share-link .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+
+    <script>
+        function copyLink() {
+            const input = document.querySelector('.share-input');
+            input.select();
+            input.setSelectionRange(0, 99999);
+            
+            try {
+                document.execCommand('copy');
+                const button = document.querySelector('.share-link .btn');
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = 'var(--success)';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '';
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy link:', err);
+            }
+        }
+    </script>
+{% endblock %}

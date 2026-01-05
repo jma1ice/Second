@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}Create Poll - Second{% endblock %}
+
+{% block content %}
+    <div class="create-header">
+        <h1>Create New Poll</h1>
+        <p class="subtitle">Set up a strategic challenge with exactly three options.</p>
+    </div>
+
+    <div class="create-form-container">
+        <form method="POST" class="create-form">
+            <div class="form-group">
+                <label for="topic" class="form-label">Poll Topic</label>
+                <input type="text" 
+                    id="topic" 
+                    name="topic" 
+                    class="form-input" 
+                    placeholder="e.g., Most popular Muppet character"
+                    required
+                    maxlength="200">
+                <small class="form-help">Make it interesting and debatable!</small>
+            </div>
+
+            <div class="options-section">
+                <h3>The Three Options</h3>
+                <p class="options-help">Remember: players will try to guess which option comes <em>second</em>, not first.</p>
+                
+                <div class="form-group">
+                    <label for="option1" class="form-label">Option 1</label>
+                    <input type="text" 
+                        id="option1" 
+                        name="option1" 
+                        class="form-input" 
+                        placeholder="e.g., Kermit the Frog"
+                        required
+                        maxlength="100">
+                </div>
+
+                <div class="form-group">
+                    <label for="option2" class="form-label">Option 2</label>
+                    <input type="text" 
+                        id="option2" 
+                        name="option2" 
+                        class="form-input" 
+                        placeholder="e.g., Fozzie Bear"
+                        required
+                        maxlength="100">
+                </div>
+
+                <div class="form-group">
+                    <label for="option3" class="form-label">Option 3</label>
+                    <input type="text" 
+                        id="option3" 
+                        name="option3" 
+                        class="form-input" 
+                        placeholder="e.g., Animal"
+                        required
+                        maxlength="100">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Create Poll</button>
+                <a href="{{ url_for('home') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+
+        <div class="strategy-tips">
+            <div class="card">
+                <h3>Strategy Tips for Poll Creators</h3>
+                <ul class="tips-list">
+                    <li><strong>Make it debatable:</strong> Avoid obvious answers where one choice dominates.</li>
+                    <li><strong>Know your audience:</strong> Consider what they might think is popular.</li>
+                    <li><strong>Balance the options:</strong> Each should be plausibly second-place.</li>
+                    <li><strong>Think psychology:</strong> How will people second-guess each other?</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .create-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .create-form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .create-form-container {
+                grid-template-columns: 1fr 300px;
+            }
+        }
+
+        .create-form {
+            background: rgba(26, 26, 46, 0.7);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-help {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            font-family: var(--font-mono);
+        }
+
+        .options-section {
+            margin: 2rem 0;
+            padding: 2rem 0;
+            border-top: 1px solid var(--border-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .options-section h3 {
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+        }
+
+        .options-help {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .options-help em {
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .form-actions .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        .strategy-tips {
+            align-self: start;
+        }
+
+        .strategy-tips h3 {
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .tips-list {
+            list-style: none;
+            color: var(--text-secondary);
+        }
+
+        .tips-list li {
+            margin-bottom: 1rem;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .tips-list li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent-gold);
+            font-weight: bold;
+        }
+
+        .tips-list strong {
+            color: var(--text-primary);
+        }
+    </style>
+{% endblock %}

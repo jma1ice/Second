@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Second{% endblock %}</title>
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    </head>
+    <body>
+        <div class="app-container">
+            <nav class="nav-header">
+                <div class="nav-content">
+                    <a href="{{ url_for('home') }}" class="logo">
+                        <span class="logo-text">Second</span>
+                        <span class="logo-subtitle">The Strategy Game Based On r/Second</span>
+                    </a>
+                    <div class="nav-links">
+                        <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+                        <a href="{{ url_for('create_poll') }}" class="nav-link nav-link-primary">Create Poll</a>
+                    </div>
+                </div>
+            </nav>
+
+            <main class="main-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="flash-messages">
+                            {% for category, message in messages %}
+                                <div class="flash flash-{{ category }}">
+                                    <span class="flash-icon">{{ '✓' if category == 'success' else '⚠' }}</span>
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </main>
+
+            <footer class="app-footer">
+                <div class="footer-content">
+                    <p class="footer-text">Remember: You win by guessing what comes <em>second</em></p>
+                </div>
+            </footer>
+        </div>
+
+        <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    </body>
+</html>
