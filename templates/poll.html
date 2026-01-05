@@ -26,23 +26,29 @@
 
             <form method="POST" action="{{ url_for('vote', poll_id=poll.id) }}" class="vote-form">
                 <div class="vote-options">
-                    <label class="vote-option" for="option1">
+                    <div class="vote-option-wrapper">
                         <input type="radio" name="option" value="1" id="option1" required>
-                        <span class="vote-option-number">1.</span>
-                        <span class="vote-option-label">{{ poll.option1 }}</span>
-                    </label>
+                        <label class="vote-option" for="option1">
+                            <span class="vote-option-number">1.</span>
+                            <span class="vote-option-label">{{ poll.option1 }}</span>
+                        </label>
+                    </div>
 
-                    <label class="vote-option" for="option2">
+                    <div class="vote-option-wrapper">
                         <input type="radio" name="option" value="2" id="option2" required>
-                        <span class="vote-option-number">2.</span>
-                        <span class="vote-option-label">{{ poll.option2 }}</span>
-                    </label>
+                        <label class="vote-option" for="option2">
+                            <span class="vote-option-number">2.</span>
+                            <span class="vote-option-label">{{ poll.option2 }}</span>
+                        </label>
+                    </div>
 
-                    <label class="vote-option" for="option3">
+                    <div class="vote-option-wrapper">
                         <input type="radio" name="option" value="3" id="option3" required>
-                        <span class="vote-option-number">3.</span>
-                        <span class="vote-option-label">{{ poll.option3 }}</span>
-                    </label>
+                        <label class="vote-option" for="option3">
+                            <span class="vote-option-number">3.</span>
+                            <span class="vote-option-label">{{ poll.option3 }}</span>
+                        </label>
+                    </div>
                 </div>
 
                 <div class="vote-actions">

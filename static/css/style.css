@@ -380,7 +380,26 @@ h3 {
     margin: 2rem 0;
 }
 
+/* Vote Options */
+.vote-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.vote-option-wrapper {
+    position: relative;
+}
+
+.vote-option-wrapper input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
 .vote-option {
+    display: block;
     background: rgba(22, 33, 62, 0.3);
     border: 2px solid var(--border-subtle);
     border-radius: 12px;
@@ -389,6 +408,7 @@ h3 {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    width: 100%;
 }
 
 .vote-option:hover {
@@ -397,10 +417,21 @@ h3 {
     transform: translateX(8px);
 }
 
-.vote-option input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
+.vote-option-wrapper input[type="radio"]:checked + .vote-option {
+    border-color: var(--accent-gold) !important;
+    background: rgba(255, 215, 0, 0.1) !important;
+    box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.3), var(--glow-gold);
+    transform: translateX(8px);
+}
+
+.vote-option-wrapper input[type="radio"]:checked + .vote-option .vote-option-number {
+    color: var(--accent-gold);
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+}
+
+.vote-option-wrapper input[type="radio"]:checked + .vote-option .vote-option-label {
+    color: var(--accent-gold);
+    font-weight: 700;
 }
 
 .vote-option-label {
